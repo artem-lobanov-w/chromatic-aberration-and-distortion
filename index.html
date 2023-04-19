@@ -17,16 +17,17 @@
         uniform sampler2D tex;
         uniform vec3 mouseCoord;
         uniform float speed;
+        uniform float time;
         // * 0.5625
 
-        vec2 rotateCoord(vec2 pixel, float pi, vec2 mouse, float distFactor) {
+        vec2 rotateCoord(vec2 pixel, float pi, vec2 mouse, float distFactor, float time) {
             vec2 uv = pixel - mouse;
             vec2 mNew;
             mNew.x = cos(pi)*mouse.x + sin(pi)*mouse.y;
             mNew.y = -sin(pi)*mouse.x + cos(pi)*mouse.y;
 
             //Сила закручивания
-            float powerRotate = 0.10*speed*0.02;
+            float powerRotate = 0.50;
 
             //Поворачиваем координаты
             vec2 uvNew;
@@ -39,6 +40,7 @@
 
 
         void main() {
+            float time;
             float pi = 3.1415926535;
             vec3 color;
             vec2 pixel = gl_FragCoord.xy / res.xy;
@@ -46,18 +48,18 @@
             float dist = distance(gl_FragCoord.xy,mouseCoord.xy);
             float r = mouseCoord.z * 4.0;
             float distFactor = 1.0 - dist / r;
-            vec2 uvNew = rotateCoord( pixel, pi, mouse, distFactor);
-            
+            vec2 uvNew = rotateCoord( pixel, pi, mouse, distFactor, time);
+          
             vec4 te;
             if(dist<r) {
                 distFactor = pow(distFactor,2.0) * 2.264;
-                te.r = texture2D(tex,uvNew-0.0001*speed*(distFactor)).r;
+                te.r = texture2D(tex,uvNew-0.004*(distFactor)).r;
                 te.g = texture2D(tex,uvNew).g;
-                te.b = texture2D(tex,uvNew+0.0001*speed*(distFactor)).b;
+                te.b = texture2D(tex,uvNew+0.004*(distFactor)).b;
                 color = te.rgb ;
             } else {
                 te = texture2D(tex,pixel);
-                color = te.rgb + distFactor * 0.0016;
+                color = te.rgb ;
             }
             gl_FragColor = vec4(color,1.0);
        }
